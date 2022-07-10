@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shopping Cart</title>
+</head>
+<body>
+<form>
+    <label>SHOPPING CART</label><br>
+    <label for="inputSoupQuantity">Soup</label>
+    <input type="text" id="inputSoupQuantity" name="inputSoupQuantity" placeholder="Enter the Quantity"><br>
+    <label for="inputMilkQuantity">Milk</label>
+    <input type="text" id="inputMilkQuantity" name="inputMilkQuantity" placeholder="Enter the Quantity"><br>
+    <label for="inputAppleQuantity">Apple</label>
+    <input type="text" id="inputAppleQuantity" name="inputAppleQuantity" placeholder="Enter the Quantity"><br>
+    <label for="inputBreadQuantity">Bread</label>
+    <input type="text" id="inputBreadQuantity" name="inputBreadQuantity" placeholder="Enter the Quantity"><br><br>
+
+
+    <button type="Button">Generate Bill</button><br><br>
+
+    <label for="bill">Bill</label><br>
+    <textarea id="bill" name="bill" rows="4" cols="50"></textarea><br><br>
+
+
+</form>
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("button").click(function(){
+        $.ajax({
+            type:'POST',
+            dataType:"json",
+            url:'http://localhost:8080/generate',
+            data:JSON.stringify({
+                "appleQuantity": $("#inputAppleQuantity").val(),
+                "milkQuantity":  $("#inputMilkQuantity").val(),
+                "breadQuantity": $("#inputBreadQuantity").val(),
+                "soupQuantity":  $("#inputSoupQuantity").val()
+            }),
+            contentType: 'application/json; charset=utf-8',
+            success:function(data){
+            let bill;
+                if(data.offers.every(value => value === null)){
+                    bill = "".concat("Subtotal: £" , data.subTotal.toFixed(2).toString() , "\n" ,
+                              "Total: £" , data.total.toFixed(2).toString())
+                }
+                else if(data.offers[1] === null){
+                    bill = "".concat("Subtotal: £" , data.subTotal.toFixed(2).toString() , "\n" ,
+                              data.offers[0] , "\n" ,
+                              "Total: £" , data.total.toFixed(2).toString())
+                }
+                else{
+                    bill = "".concat("Subtotal: £" , data.subTotal.toFixed(2).toString() , "\n" ,
+                                  data.offers[0] , "\n" ,
+                                  data.offers[1] , "\n" ,
+                                  "Total: £" , data.total.toFixed(2).toString())
+                }
+                $("#bill").val(bill);
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>
